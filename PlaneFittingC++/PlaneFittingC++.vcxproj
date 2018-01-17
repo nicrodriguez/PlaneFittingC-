@@ -145,10 +145,16 @@
     <Text Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\BackgroundFunctions.h" />
+    <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\FileHandler.h" />
+    <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\FittingFunctions.h" />
     <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\stdafx.h" />
     <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\BackgroundFunctions.cpp" />
+    <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\FileHandler.cpp" />
+    <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\FittingFunctions.cpp" />
     <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\PlaneFittingC++.cpp" />
     <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

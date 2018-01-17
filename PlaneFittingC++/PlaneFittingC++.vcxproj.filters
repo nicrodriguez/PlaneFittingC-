@@ -24,12 +24,30 @@
     <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\BackgroundFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\FileHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\FittingFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\PlaneFittingC++.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\BackgroundFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\FileHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Nic%27s\Desktop\FlashScan3D\PlaneFittingC++\PlaneFittingC++\FittingFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
