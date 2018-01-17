@@ -28,7 +28,7 @@ vector<string> FileHandler::split(const string &s, char delim) {
 	return elems;
 }
 
-bool FileHandler::read_point_file(const string &directory, const string &point_type, vector<int> &xPoints, vector<int> &yPoints, vector<double> &zPoints) {
+bool FileHandler::read_point_file(const string &directory, const string &point_type, vector<double> &xPoints, vector<double> &yPoints, vector<double> &zPoints) {
 	string line, delimiter = ",";
 	// Reading from perfect plane file
 	ifstream point_file(directory);
@@ -36,8 +36,8 @@ bool FileHandler::read_point_file(const string &directory, const string &point_t
 		cout << point_type << " Successfully Opened" << endl;
 		while (getline(point_file, line)) {
 			vector<string> coord = split(line, ',');
-			xPoints.insert(xPoints.end(), stoi(coord.at(0)));
-			yPoints.insert(yPoints.end(), stoi(coord.at(1)));
+			xPoints.insert(xPoints.end(), stod(coord.at(0)));
+			yPoints.insert(yPoints.end(), stod(coord.at(1)));
 			zPoints.insert(zPoints.end(), stod(coord.at(2)));
 		}
 		cout << "Data Obtained Successfully" << endl;

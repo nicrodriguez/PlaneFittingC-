@@ -14,7 +14,7 @@ FittingFunctions::~FittingFunctions()
 }
 
 
-PlaneFit FittingFunctions::simplePlaneFit(vector<int> xPoints, vector<int> yPoints, vector<double> zPoints, vector<double> zPointsA) {
+PlaneFit FittingFunctions::simplePlaneFit(vector<double> xPoints, vector<double> yPoints, vector<double> zPoints) {
 	BackgroundFunctions BF;
 	vector<double> calculatedZ;
 
@@ -25,7 +25,7 @@ PlaneFit FittingFunctions::simplePlaneFit(vector<int> xPoints, vector<int> yPoin
 
 	// Calculating sum of points
 	double xSum = 0, ySum = 0, zSum = 0, xBar = 0, yBar = 0, zBar = 0;
-	for (int i = 0; i < xPoints.size(); i++) {
+	for (unsigned int i = 0; i < xPoints.size(); i++) {
 		xSum += xPoints[i];
 		ySum += yPoints[i];
 		zSum += zPoints[i];
@@ -35,11 +35,12 @@ PlaneFit FittingFunctions::simplePlaneFit(vector<int> xPoints, vector<int> yPoin
 	xBar = xSum / xPoints.size();
 	yBar = ySum / yPoints.size();
 	zBar = zSum / zPoints.size();
-	double centroid[3] = { xBar, yBar, zBar };
+	vector<double> centroid(3);
+	centroid = { xBar, yBar, zBar };
 
 	// Calculating Covariance Matrix
 	long double xx = 0, yy = 0, zz = 0, xy = 0, xz = 0, yz = 0, det_x, det_y, det_z;
-	for (int i = 0; i < xPoints.size(); i++) {
+	for (unsigned int i = 0; i < xPoints.size(); i++) {
 		xx += (xPoints[i] - centroid[0])*(xPoints[i] - centroid[0]);
 		yy += (yPoints[i] - centroid[1])*(yPoints[i] - centroid[1]);
 		xy += (xPoints[i] - centroid[0])*(yPoints[i] - centroid[1]);
@@ -91,18 +92,18 @@ PlaneFit FittingFunctions::simplePlaneFit(vector<int> xPoints, vector<int> yPoin
 	// Calculating quality of fit with rms Error
 	// Equation for z-position of plane is z = -(a*x + b*y)/c
 
-	for (int i = 0; i < zPoints.size(); i++) {
+	for (unsigned int i = 0; i < zPoints.size(); i++) {
 		calculatedZ.insert(calculatedZ.end(), -(normal[0] * xPoints[i] + normal[1] * yPoints[i]) / normal[2]);
 	}
 
-	// Calculating rms error
-	double rmsError = BF.rmsError(calculatedZ, std::move(zPointsA));
+	//// Calculating rms error
+	//double rmsError = BF.rmsError(calculatedZ, std::move(zPointsA));
 
-	return{ rmsError, normal };
+	return{calculatedZ, normal, centroid};
 }
 
 // Robust Plane Fit Function
-PlaneFit FittingFunctions::robustPlaneFit(vector<int> xPoints, vector<int> yPoints, vector<double> zPoints, vector<double> zPointsA) {
+PlaneFit FittingFunctions::robustPlaneFit(vector<double> xPoints, vector<double> yPoints, vector<double> zPoints) {
 	BackgroundFunctions BF;
 	vector<double> calculated_Z;
 
@@ -110,7 +111,7 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<int> xPoints, vector<int> yPoin
 	double xSum = 0, ySum = 0, zSum = 0, xBar = 0, yBar = 0, zBar = 0;
 
 	// Summing points for centroid calculations
-	for (int i = 0; i < xPoints.size(); i++) {
+	for (unsigned int i = 0; i < xPoints.size(); i++) {
 		xSum += xPoints[i];
 		ySum += yPoints[i];
 		zSum += zPoints[i];
@@ -120,11 +121,13 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<int> xPoints, vector<int> yPoin
 	xBar = xSum / xPoints.size();
 	yBar = ySum / yPoints.size();
 	zBar = zSum / zPoints.size();
-	double centroid[3] = { xBar, yBar, zBar };
+
+	vector<double> centroid(3);
+	centroid = { xBar, yBar, zBar };
 
 	// Calculating Covariance Matrix
 	long double xx = 0, yy = 0, zz = 0, xy = 0, xz = 0, yz = 0, det_x, det_y, det_z, weightX, weightY, weightZ;
-	for (int i = 0; i < xPoints.size(); i++) {
+	for (unsigned int i = 0; i < xPoints.size(); i++) {
 		xx += (xPoints[i] - centroid[0]) * (xPoints[i] - centroid[0]);
 		yy += (yPoints[i] - centroid[1]) * (yPoints[i] - centroid[1]);
 		xy += (xPoints[i] - centroid[0]) * (yPoints[i] - centroid[1]);
@@ -168,10 +171,6 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<int> xPoints, vector<int> yPoin
 		weighted_ny += ny[i] * weightY;
 		weighted_nz += nz[i] * weightZ;
 	}
-	cout << "WeightNX: " << weighted_nx << endl;
-	cout << "WeightNY: " << weighted_ny << endl;
-	cout << "WeightNZ: " << weighted_nz << endl;
-	cout << endl;
 
 	// Prepping for normalization
 	vector<long double> n;
@@ -179,31 +178,19 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<int> xPoints, vector<int> yPoin
 	n.insert(n.end(), weighted_ny);
 	n.insert(n.end(), weighted_nz);
 
-	for (double val : nx) {
-		cout << "nx: " << val << endl;
-	}
-	cout << endl;
-	for (double val : ny) {
-		cout << "ny: " << val << endl;
-	}
-	cout << endl;
-	for (double val : nz) {
-		cout << "nz: " << val << endl;
-	}
-	cout << endl;
 	// Normalizing the 3D vector
 	vector<double> normal = BF.normalize3D(n);
 
 	// Calculating plane points
 	// Equation for z-position of plane is z = -(a*x + b*y)/c
-	for (int i = 0; i < zPoints.size(); i++) {
+	for (unsigned int i = 0; i < zPoints.size(); i++) {
 		calculated_Z.insert(calculated_Z.end(), -(normal[0] * xPoints[i] + normal[1] * yPoints[i]) / normal[2]);
 	}
 
 	//for (double val : calculated_Z)
 	//	cout << val << endl;
 	// Calculating rms error
-	double rmsError = BF.rmsError(calculated_Z, std::move(zPointsA));
+	//double rmsError = BF.rmsError(calculated_Z, std::move(zPointsA));
 
-	return{ rmsError,  normal };
+	return{calculated_Z, normal, centroid};
 }

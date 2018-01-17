@@ -6,8 +6,9 @@
 using namespace std;
 
 struct PlaneFit {
-	double rmsError;
+	vector<double> calculated_z;
 	vector<double> normals;
+	vector<double> centroid;
 };
 
 class FittingFunctions {
@@ -20,6 +21,6 @@ public:
 	~FittingFunctions();
 
 	// Plane Fitting Functions
-	PlaneFit simplePlaneFit(vector<int>, vector<int>, vector<double>, vector<double>);
-	PlaneFit robustPlaneFit(vector<int>, vector<int>, vector<double>, vector<double>);
+	PlaneFit simplePlaneFit(vector<double>, vector<double>, vector<double>);
+	PlaneFit robustPlaneFit(vector<double>, vector<double>, vector<double>);
 };

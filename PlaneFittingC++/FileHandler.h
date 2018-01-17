@@ -16,6 +16,6 @@ private:
 public:
 	FileHandler();
 	~FileHandler();
-	bool read_point_file(const string &, const string &, vector<int> &, vector<int> &, vector<double> &);
+	bool read_point_file(const string &, const string &, vector<double> &, vector<double> &, vector<double> &);
 
 };
