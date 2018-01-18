@@ -66,24 +66,16 @@ PlaneFit FittingFunctions::simplePlaneFit(vector<double> xPoints, vector<double>
 	// Making sure the points actually span a plane
 	if (max == 0) {
 		cout << "Points don't span a plane" << endl;
-		return{};
+		return{ zPoints,{0, 0, 0 }, centroid };
 	}
-
-	vector<long double> n;
+	
+	vector<long double> n(3);
 	if (max == det_x) {
-		n.insert(n.end(), max);
-		n.insert(n.end(), xz * yz - xy * zz);
-		n.insert(n.end(), xy * yz - xz * yy);
-	}
-	else if (max == det_y) {
-		n.insert(n.end(), xz * yz - xy * zz);
-		n.insert(n.end(), max);
-		n.insert(n.end(), xy * xz - yz * xx);
-	}
-	else {
-		n.insert(n.end(), xy * yz - xz * yy);
-		n.insert(n.end(), xy * xz - yz * xx);
-		n.insert(n.end(), max);
+		n = { max, xz * yz - xy * zz, xy * yz - xz * yy };
+	}else if (max == det_y) {
+		n = { xz * yz - xy * zz, max, xy * xz - yz * xx };
+	}else {
+		n = { xy * yz - xz * yy , xy * xz - yz * xx, max };
 	}
 
 	// Normalizing the 3D vector
@@ -147,9 +139,9 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<double> xPoints, vector<double>
 	weightX = det_x * det_x;
 	weightY = det_y * det_y;
 	weightZ = det_z * det_z;
-	vector<long double>w(3), nx(3), ny(3), nz(3);
 	
 	// Putting covariance matrix together
+	vector<long double>w(3), nx(3), ny(3), nz(3);
 	w = { weightX, weightY, weightZ };
 	nx = { det_x, xz * yz - xy * zz, xy * yz - xz * yy };
 	ny = { xz * yz - xy * zz, det_y, xy * xz - yz * xx };
@@ -165,35 +157,10 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<double> xPoints, vector<double>
 		if (dot_prod < 0)
 			w[i] *= -1;
 
-		weightedN[i] += wn[i][0] * w[i];
-		weightedN[i] += wn[i][1] * w[i];
-		weightedN[i] += wn[i][2] * w[i];
+		weightedN[0] += wn[i][0] * w[i];
+		weightedN[1] += wn[i][1] * w[i];
+		weightedN[2] += wn[i][2] * w[i];
 	}
-
-	//long double dot_prodx = 0 * nx[0] + 0 * nx[1] + 0 * nx[2];
-	//long double dot_prody = 0 * ny[0] + 0 * ny[1] + 0 * ny[2];
-	//long double dot_prodz = 0 * nz[0] + 0 * nz[1] + 0 * nz[2];
-
-	//if (dot_prodx < 0)
-	//	weightX = -weightX;
-
-	//if (dot_prody < 0)
-	//	weightY = -weightY;
-
-	//if (dot_prodz < 0)
-	//	weightZ = -weightZ;
-
-	//for (int i = 0; i < sizeof(nx) / sizeof(nx[0]); i++) {
-	//	weighted_nx += nx[i] * weightX;
-	//	weighted_ny += ny[i] * weightY;
-	//	weighted_nz += nz[i] * weightZ;
-	//}
-
-	//// Prepping for normalization
-	//vector<long double> n;
-	//n.insert(n.end(), weighted_nx);
-	//n.insert(n.end(), weighted_ny);
-	//n.insert(n.end(), weighted_nz);
 
 	// Normalizing the 3D vector
 	vector<double> normal = BF.normalize3D(weightedN);
@@ -203,11 +170,6 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<double> xPoints, vector<double>
 	for (unsigned int i = 0; i < zPoints.size(); i++) {
 		calculated_Z.insert(calculated_Z.end(), -(normal[0] * xPoints[i] + normal[1] * yPoints[i]) / normal[2]);
 	}
-
-	//for (double val : calculated_Z)
-	//	cout << val << endl;
-	// Calculating rms error
-	//double rmsError = BF.rmsError(calculated_Z, std::move(zPointsA));
 
 	return{calculated_Z, normal, centroid};
 }
