@@ -109,7 +109,7 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<double> xPoints, vector<double>
 
 	// Calculating centroid of the points
 	double xSum = 0, ySum = 0, zSum = 0, xBar = 0, yBar = 0, zBar = 0;
-
+	unsigned int n = xPoints.size();
 	// Summing points for centroid calculations
 	for (unsigned int i = 0; i < xPoints.size(); i++) {
 		xSum += xPoints[i];
@@ -118,12 +118,8 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<double> xPoints, vector<double>
 	}
 
 	// Calculating centroid
-	xBar = xSum / xPoints.size();
-	yBar = ySum / yPoints.size();
-	zBar = zSum / zPoints.size();
-
 	vector<double> centroid(3);
-	centroid = { xBar, yBar, zBar };
+	centroid = { xSum/n, ySum/n, zSum/n };
 
 	// Calculating Covariance Matrix
 	long double xx = 0, yy = 0, zz = 0, xy = 0, xz = 0, yz = 0, det_x, det_y, det_z, weightX, weightY, weightZ;
@@ -135,10 +131,15 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<double> xPoints, vector<double>
 		yz += (yPoints[i] - centroid[1]) * (zPoints[i] - centroid[2]);
 		zz += (zPoints[i] - centroid[2]) * (zPoints[i] - centroid[2]);
 	}
+	
+	xx /= n;
+	yy /= n;
+	xy /= n;
+	xz /= n;
+	yz /= n;
+	zz /= n;
 
 	// Calculating determinants and weights for each axis
-	long double weighted_nx = 0, weighted_ny = 0, weighted_nz = 0;
-
 	det_x = yy * zz - yz * yz;
 	det_y = xx * zz - xz * xz;
 	det_z = xx * yy - xy * xy;
@@ -146,40 +147,56 @@ PlaneFit FittingFunctions::robustPlaneFit(vector<double> xPoints, vector<double>
 	weightX = det_x * det_x;
 	weightY = det_y * det_y;
 	weightZ = det_z * det_z;
-
-
+	vector<long double>w(3), nx(3), ny(3), nz(3);
+	
 	// Putting covariance matrix together
-	long double nx[3] = { det_x, xz * yz - xy * zz, xy * yz - xz * yy };
-	long double ny[3] = { xz * yz - xy * zz, det_y, xy * xz - yz * xx };
-	long double nz[3] = { xy * yz - xz * yy, xy * xz - yz * xx, det_z };
+	w = { weightX, weightY, weightZ };
+	nx = { det_x, xz * yz - xy * zz, xy * yz - xz * yy };
+	ny = { xz * yz - xy * zz, det_y, xy * xz - yz * xx };
+	nz = { xy * yz - xz * yy, xy * xz - yz * xx, det_z };
 
-	long double dot_prodx = 0 * nx[0] + 0 * nx[1] + 0 * nx[2];
-	long double dot_prody = 0 * ny[0] + 0 * ny[1] + 0 * ny[2];
-	long double dot_prodz = 0 * nz[0] + 0 * nz[1] + 0 * nz[2];
+	vector<long double> weightedN(3);
+	weightedN = { 0, 0, 0 };
+	vector<vector<long double>>wn(3);
+	wn = { nx, ny, nz };
+	for (unsigned int i = 0; i < nx.size(); i++) {
+		long double dot_prod = weightedN[0] * wn[i][0] + weightedN[1] * wn[i][1] + weightedN[2] * wn[i][2];
+		
+		if (dot_prod < 0)
+			w[i] *= -1;
 
-	if (dot_prodx < 0)
-		weightX = -weightX;
-
-	if (dot_prody < 0)
-		weightY = -weightY;
-
-	if (dot_prodz < 0)
-		weightZ = -weightZ;
-
-	for (int i = 0; i < sizeof(nx) / sizeof(nx[0]); i++) {
-		weighted_nx += nx[i] * weightX;
-		weighted_ny += ny[i] * weightY;
-		weighted_nz += nz[i] * weightZ;
+		weightedN[i] += wn[i][0] * w[i];
+		weightedN[i] += wn[i][1] * w[i];
+		weightedN[i] += wn[i][2] * w[i];
 	}
 
-	// Prepping for normalization
-	vector<long double> n;
-	n.insert(n.end(), weighted_nx);
-	n.insert(n.end(), weighted_ny);
-	n.insert(n.end(), weighted_nz);
+	//long double dot_prodx = 0 * nx[0] + 0 * nx[1] + 0 * nx[2];
+	//long double dot_prody = 0 * ny[0] + 0 * ny[1] + 0 * ny[2];
+	//long double dot_prodz = 0 * nz[0] + 0 * nz[1] + 0 * nz[2];
+
+	//if (dot_prodx < 0)
+	//	weightX = -weightX;
+
+	//if (dot_prody < 0)
+	//	weightY = -weightY;
+
+	//if (dot_prodz < 0)
+	//	weightZ = -weightZ;
+
+	//for (int i = 0; i < sizeof(nx) / sizeof(nx[0]); i++) {
+	//	weighted_nx += nx[i] * weightX;
+	//	weighted_ny += ny[i] * weightY;
+	//	weighted_nz += nz[i] * weightZ;
+	//}
+
+	//// Prepping for normalization
+	//vector<long double> n;
+	//n.insert(n.end(), weighted_nx);
+	//n.insert(n.end(), weighted_ny);
+	//n.insert(n.end(), weighted_nz);
 
 	// Normalizing the 3D vector
-	vector<double> normal = BF.normalize3D(n);
+	vector<double> normal = BF.normalize3D(weightedN);
 
 	// Calculating plane points
 	// Equation for z-position of plane is z = -(a*x + b*y)/c
